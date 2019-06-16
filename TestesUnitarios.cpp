@@ -12,6 +12,7 @@ using namespace std;
 #define MAX 100
 list <int> codigosAdc;
 list <string> loginsAdc;
+
 /* CLASSE RUA */
 class Rua{
 	string nome;
@@ -148,6 +149,7 @@ class Cliente{
 		void printMenuCliente(); 
 		void adcMsg(string msg);
 		void verCaixa(); 
+		void adicionarRua(int NumeroRua);
 		void adicionarRua();
 		void printRuasCliente();
 };
@@ -250,6 +252,32 @@ void Cliente::verCaixa(){
 	//As mensagens são excluídas da caixa após serem lidas.	
 }
 
+
+void Cliente::adicionarRua(int NumeroRua){
+	int opcao10=0, contador=0,contador2=0;
+	bool jatem=false;
+	if(NumeroRua==0)
+		return;
+	for(list<Rua>::iterator q=RuaSist.begin(); q!=RuaSist.end(); ++q){
+		contador++;
+		if(contador==NumeroRua){
+			for(list<Rua>::iterator p=RuaSist.begin(); p!=RuaSist.end(); ++p){
+				contador2++;
+				if(q == p && contador!=contador2){
+					jatem=true;
+				}
+			}
+			if(jatem==false){
+				ruasCliente.push_back(*q);
+				cout << endl << "Rua adicionada com sucesso." << endl << endl;
+			}
+			else
+				cout << "Rua já existe no sistema." << endl << endl;
+		}
+	}
+}
+
+
 void Cliente::adicionarRua(){
 	int opcao10=0, contador=0,contador2=0;
 	bool jatem=false;
@@ -294,7 +322,8 @@ void Cliente::printRuasCliente(){
 		tem=true;
 	}
 	if(tem==false)
-		cout << endl << "Não há ruas adicionadas ainda." << endl;
+		cout << endl << "Não há ruas adicionadas ainda." << endl << endl;
+	cout << "************************************************" << endl << endl;
 }
 /* --------------- FIM CLIENTE ---------------*/
 
@@ -350,10 +379,12 @@ void modificaRua(string nomerua, string bairrorua, bool congest, bool acidente, 
 			q->setAcidente(acidente);
 			q->setTotal(total);
 			modificou=true;
+			cout << endl << "Rua modificada com sucesso" << endl;
 			//DOUBLE ITERATOR, ITERANDO CADA CLIENTE EM CADA RUA ADICIONADA POR ELE E VENDO SE BATE
 			for(list<Cliente>::iterator c1=Clientes.begin(); c1!=Clientes.end(); ++c1){	
 				for(list<Rua>::iterator p=c1->ruasCliente.begin(); p!=c1->ruasCliente.end(); ++p){
 					if(p->getNome() == q->getNome() && p->getBairro()==q->getBairro()){
+							
 						c1->ruasCliente.erase(p);
 						c1->ruasCliente.push_back(*q); 
 						c1->adcMsg(msg);
@@ -427,8 +458,8 @@ void realizaCadastro (){
 
 void testePrintClientes(){ //Apenas para testar os clientes encadeados.
 	int cont=0;
-	cout << "************ PERFIL DOS CLIENTES ************" << endl;
 	for(list<Cliente>::iterator c1=Clientes.begin(); c1!=Clientes.end(); ++c1){
+		cout << "************* PERFIL DO CLIENTE **************" << endl;
 		cont++;
 		cout << "Cliente " << cont << endl;
 		cout << "Nome: " << c1->getNome() << endl;
@@ -436,6 +467,7 @@ void testePrintClientes(){ //Apenas para testar os clientes encadeados.
 		cout << "Celular: " << c1->getCelular() << endl;
 		cout << "Codigo: " << c1->getCod() << endl;
 		cout << "Nome de login: " << c1->getLogin() << endl << endl;
+		cout << "**********************************************" << endl << endl;
 		c1->printRuasCliente();
 	}
 }
@@ -448,6 +480,8 @@ int main() {
 	bool logado=false;
 
 	list <Cliente>::iterator clienteAtual;
+
+	// ************ INCLUSÕES OBRIGATÓRIAS ANTES DO INÍCIO DOS TESTES ************ //
 
 	//ADIÇÃO DE RUAS AO SISTEMA
 	//(nome da rua, bairro)
@@ -470,82 +504,57 @@ int main() {
 	adicionaClienteSistema("Victor", "victorkarnopp@hotmail.com", "047999999999", "vitinho", "fazedordecerca");
 	adicionaClienteSistema ("Gustavo Bonassa", "gustavo.bonassa@hotmail.com", "047999169194", "gustavinho", "gugu123");
 	
-	//PARA PRINTAR TODOS OS CLIENTES NO SISTEMA.
-	//testePrintClientes(); 
 
-	//AQUI PARA TESTE, PARA VER SE INCREMENTA NA CAIXA DE MENSAGENS
+	// ************************************************************* //
+	// *********************** TESTES ****************************** //
+
+
+	//TESTE 0
+	cout << endl << "0) NESTE TESTE PRINTAREMOS TODAS AS RUAS ADICIONADAS DO SISTEMAS " << endl;
+	printaRuaSistema();
+	cout << "************************************************" << endl << endl;	
+
+	//TESTE 1
+	cout << "1) AQUI PRINTAMOS OS QUATRO CLIENTES NO SISTEMA ANTES DA ADIÇÃO DE QUALQUER COISA EM SUAS CONTAS. DADO PRIMEIRAMENTE POR SEU PERFIL E EM SEGUIDA AS RUAS ADICIONADAS DO MESMO, EM OUTRA TELA." << endl << endl;
+	testePrintClientes(); 
+
+	//TESTE 2
+	cout << "2) AGORA ADICIONAMOS NO CLIENTE GEREMIAS CORREA ALGUMAS RUAS, QUE IREMOS VERIFICAR POSTERIORMENTE SE FORAM ADICIONADAS COM O PRINTCLIENTE()." << endl << endl;
 	clienteAtual = Clientes.begin();
-	clienteAtual->adicionarRua();
+	clienteAtual->adicionarRua(4);
+	clienteAtual->adicionarRua(1);
+	clienteAtual->adicionarRua(2);
+	clienteAtual->adicionarRua(9);
+	cout << "********************************************" << endl << endl;
+	cout << "2.1) AGORA PRINTANDO O CLIENTE PARA VERIFICAR SEU ESTADO ATUAL " << endl;
+	clienteAtual->printCliente();
+	cout << endl << "******************************************" << endl << endl;
+	
+	//TESTE 3
+	cout << "3) AGORA PRINTANDO TODOS OS CLIENTES NOVAMENTE, INCLUSIVE SUAS RUAS, PARA VERIFICAR OS MESMOS APÓS TAIS ADICÕES. APENAS O CLIENTE GEREMIAS CORREA SOFRERÁ ALTERAÇÕES REFERENTE AO TESTE 1." << endl << endl;
+	testePrintClientes();
 
-
-	//MODIFICAÇÕES EM RUAS --TESTE
-	//void modificaRua(string nomerua, string bairrorua, bool congest, bool acidente, bool total)
+	//TESTE 4
+	cout << "4) AGORA FAZENDO MODIFICAÇÕES EM ALGUMAS RUAS, PARA VERIFICAR SE SERÁ CORRETAMENTE ENVIADO A CAIXA DE MENSAGENS DOS CLIENTES QUE POSSUEM AS MESMAS ADICIONADAS. NOVAMENTE, COMO SOMENTE O CLIENTE GEREMIAS POSSUIU RUAS ADICIONADAS, ENTÃO O MESMO DEVE TER INCREMENTO NA CAIXA DE MENSAGENS." << endl;
+	
 	modificaRua("Rua Blumenau","Centro", true, true, false, "Acidente na rua Blumenau. 13h56.");
 	modificaRua("Rua Tuiuti","Iririú", true, true, true, "Acidente na rua Tuiuti, Iririú. 17h52.");
+	cout << "**************************************************" << endl << endl;
 
-	while(opcao!=0){
-		cout << "******* BEM-VINDO AO SISTEMA SIRU ********" << endl << endl;
-		cout << "[1] Login. " << endl;
-		cout << "[2] Realizar cadastro." << endl;
-		cout << "[0] Sair." << endl << endl;
-		cout << "Opção: ";
-		cin >> opcao;
-		cout << endl << "******************************************" << endl << endl;
-		
-		if (opcao == 1){ //testada -- login
-			cout << "**************** LOGIN *******************" << endl << endl;
-			string loginaux,senhaaux;
-			bool loginVal=false;
-			cin.ignore();
-			cout << "Digite o login: ";
-			getline(cin,loginaux);
-			cout << "Digite a senha: ";
-			cin >> senhaaux;
-			for(clienteAtual=Clientes.begin(); clienteAtual!=Clientes.end(); ++clienteAtual){
-				if(clienteAtual->getLogin() == loginaux && clienteAtual->getSenha() == senhaaux){
-					loginVal=true;
-					break;
-				}
-			}
-			if(loginVal==true){
-				logado=true;
-			}
-			else
-				cout << endl << "Login inválido. Voltando ao menu inicial." << endl;
-		}
-		else if(opcao == 2){
-			realizaCadastro();
-		}
-		cout << endl << "******************************************" << endl << endl;
-
-		if(logado==true){
-			opcao2=1;
-			while(opcao2!=0){
-				clienteAtual->printMenuCliente();
-				cout << "Opcao: ";
-				cin >> opcao2;
-				cout << endl << "******************************************" << endl;
-				switch (opcao2){
-					case 1:
-						clienteAtual->adicionarRua();
-						break;
-					case 2:
-						printaRuaSistema();
-						break;
-					case 3:
-						clienteAtual->printRuasCliente();
-						break;
-					case 4:
-						clienteAtual->verCaixa();
-						break;
-					case 5:
-						clienteAtual->printCliente();
-					case 0:
-						logado=false;
-						break;
-				}
-				cout << endl << "******************************************" << endl;
-			}
-		}
+	for(list<Cliente>::iterator q=Clientes.begin(); q!=Clientes.end(); ++q){
+		cout << "Cliente atual: " << q->getNome() << endl;
+		q->printMenuCliente();
+		cout << "*************************************************" << endl << endl;
 	}
+
+	//TESTE 5
+	cout << "5) NESTE TESTE LEREMOS A CAIXA DE MENSAGENS DO CLIENTE GEREMIAS, CUJO POSSUI AINDA 2 MENSAGENS NÃO LIDAS. APÓS A LEITURA DA MESMA AS MENSAGENS SÃO EXCLUÍDAS, ENTÃO ABRIREMOS ELA DUAS VEZES PARA CONFERÊNCIA." << endl << endl;
+
+	clienteAtual = Clientes.begin();
+	cout << "Cliente atual: " << clienteAtual->getNome() << endl;
+	clienteAtual->verCaixa();
+	clienteAtual->verCaixa();
+	cout << endl << "************************************************" << endl << endl;
+
+	cout << endl <<"FIM DOS TESTES UNITÁRIOS" << endl;
 }
